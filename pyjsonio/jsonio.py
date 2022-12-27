@@ -1,10 +1,15 @@
 import json
+from pydantic import BaseModel
+
 
 
 class JsonIO:
 
 
-    def __init__(self, json_file: str) -> None:
+
+    def __init__(self, json_file: str, model: BaseModel = None) -> None:
+
+        self.model = model
         
         self.file = json_file
 
@@ -12,6 +17,14 @@ class JsonIO:
             self._dict = json.load(f)
             f.close()
 
+
+    def validate(self) -> bool:
+        for element in self._dict:
+            try:
+                self.model(**element)
+            except:
+                return False
+        return True
 
     def read(self, json_file: str) -> None:
         with open(json_file, "r") as f:
@@ -36,9 +49,16 @@ class JsonIO:
     def json(self) -> str:
         return json.dumps(self._dict)
 
+    def pydantic(self) -> list:
+        return [self.model(**element) for element in self._dict]
+
+    
+    def __len__(self) -> int:
+        return len(self._dict)
+
     
     def __getitem__(self, key: int) -> dict:
-        return self._dict[key]
+        return self.model(**self._dict[key])
 
     
     def __str__(self) -> str:
