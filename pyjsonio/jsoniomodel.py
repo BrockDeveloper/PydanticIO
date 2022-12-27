@@ -2,10 +2,17 @@ from pydantic import BaseModel
 
 class JsonIOModel(BaseModel):
 
-    # make the model subscriptable
     def __getitem__(self, key):
-        return self.dict()[key]
 
-    # make the model item assignable
+        if not hasattr(self, key):
+            return None
+        else:
+            return self.dict()[key]
+
+
     def __setitem__(self, key, value):
-        setattr(self, key, value)
+
+        if not hasattr(self, key):
+            raise AttributeError(f"Model {self.__class__.__name__} has no attribute {key}")
+        else:
+            setattr(self, key, value)

@@ -6,7 +6,6 @@ class TestModel(JsonIOModel):
     name: str
 
 
-test = JsonIO("testfile.json", TestModel)
-print(test)
-test.remove(2)
+test = JsonIO("testfile.json", TestModel, key = "id")
+test.sort()
 print(test)

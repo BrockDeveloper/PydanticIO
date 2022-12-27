@@ -7,16 +7,7 @@ class JsonIO:
 
 
 
-    def __init__(self, json_file: str, model: BaseModel) -> None:
-
-        '''
-        Initialize the JsonIO class
-        
-        :param json_file: The json file to read from
-        :param model: The pydantic model to use for validation
-        
-        :return: None
-        '''
+    def __init__(self, json_file: str, model: BaseModel, key: str = None) -> None:
 
         self.model = model
         self.file = json_file
@@ -27,7 +18,14 @@ class JsonIO:
 
         self.items = [self.model(**element) for element in _dict]
         del _dict
-    
+
+        self.key = key
+
+        # key must be a key in the model
+        if key is not None:
+            if key not in self.model.__fields__:
+                raise Exception("key must be a key in the model")
+
 
 
     def read(self, json_file: str) -> None:
@@ -38,6 +36,7 @@ class JsonIO:
 
         self.items = [self.model(**element) for element in _dict]
         del _dict
+
 
     
     def write(self, json_file: str = None) -> None:
@@ -50,34 +49,60 @@ class JsonIO:
             f.close()
 
 
+
+    def sort(self) -> None:
+        if self.key is None:
+            raise Exception("key not set")
+        self.items.sort(key=lambda x: x[self.key])
+
+
     def dict(self) -> list:
         return [element.dict() for element in self.items]
+
+
 
     def append(self, item: BaseModel) -> None:
         self.items.append(item)
 
+        # sort by key
+
+
     def remove(self, item: BaseModel) -> None:
         self.items.remove(item)
+        # sort by key
+
+
     
-    def remove(self, index: int) -> None:
-        del self.items[index]
+    def remove(self, key) -> None:
+        if self.key is None:
+            raise Exception("key not set")
+        for i in range(len(self.items)):
+            if self.items[i][self.key] == key:
+                del self.items[i]
+                break
+
 
 
     def __getitem__(self, key):
         return self.items[key]
 
 
+
     def __iter__(self):    # remove an item by index
         return iter(self.items)
+
 
     
     def __len__(self):
         return len(self.items)
 
 
+
     def __str__(self):
         return str(self.items)
     
+
+
     def __del__(self):
         del self.items
         del self.model
