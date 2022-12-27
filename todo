@@ -1,8 +1,8 @@
 [] optional model
-[] dict translation
-[] input and output to/fom file
+[x] dict translation
+[x] input and output to/fom file
 [] exceptions handler
 [] model definition
-[] access to elements (key and global)
-[] json and dict manipulation
+[x] access to elements (key and global)
+[x] json and dict manipulation
 [] data validation 8with pydantic?)
