@@ -42,9 +42,14 @@ def pydantic_test():
 
     json_test = JsonIO("testfile.json", model=TestModel)
 
-
     print("validate: ", json_test.validate())
 
     print("get all elements as pydantic objects: ", json_test.pydantic())
+
+    print("Test getattr switch off: ")
+    print("Before: ", json_test[0])
+    json_test[0]["name"] = "Doo"
+    print("After: ", json_test[0])
+
 
 pydantic_test()
