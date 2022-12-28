@@ -1,5 +1,5 @@
 import json
-from pydantic import BaseModel
+from pyjsonio.jsoniomodel import JsonIOModel
 
 
 
@@ -7,35 +7,48 @@ class JsonIO:
 
 
 
-    def __init__(self, json_file: str, model: BaseModel, key: str = None) -> None:
+    def __init__(self, json_file: str, model: JsonIOModel, key: str = None) -> None:
+
+        self.model = None
+        self.file = None
+        self.items = []
+        self.key = None
+
+        if not issubclass(model, JsonIOModel):
+            raise Exception("model must be a JsonIOModel") from None
+
+        try:
+            with open(json_file, "r") as f:
+                f.close()
+        except:
+            raise Exception("file not found: " + json_file) from None
 
         self.model = model
         self.file = json_file
 
         with open(json_file, "r") as f:
-            _dict = json.load(f)
+
+            # check if file is empty
+            if f.read(1) == "":
+                _dict = []
+            else:
+                f.seek(0)
+                _dict = json.load(f)
             f.close()
-
-        self.items = [self.model(**element) for element in _dict]
+            
+        try:
+            self.items = [self.model(**element) for element in _dict]
+        except:
+            raise Exception("file does not match model") from None
+        
         del _dict
-
-        self.key = key
 
         # key must be a key in the model
         if key is not None:
             if key not in self.model.__fields__:
-                raise Exception("key must be a key in the model")
-
-
-
-    def read(self, json_file: str) -> None:
-
-        with open(json_file, "r") as f:
-            _dict = json.load(f)
-            f.close()
-
-        self.items = [self.model(**element) for element in _dict]
-        del _dict
+                raise Exception("key must be a field in the model") from None
+        
+        self.key = key
 
 
     
@@ -44,9 +57,13 @@ class JsonIO:
         if json_file is None:
             json_file = self.file
 
-        with open(json_file, "w") as f:
-            json.dump([element.dict() for element in self.items], f, indent=4)
-            f.close()
+        try:
+            with open(json_file, "w") as f:
+                # datas are validated, so no need to check if they are valid
+                json.dump([element.dict() for element in self.items], f, indent=4)
+                f.close()
+        except:
+            raise Exception("error writing to file: " + json_file) from None
 
 
 
@@ -61,17 +78,21 @@ class JsonIO:
 
 
 
-    def append(self, item: BaseModel) -> None:
-        self.items.append(item)
+    def append(self, item: JsonIOModel) -> None:
 
-        # sort by key
+        if not issubclass(item, self.model):
+            raise Exception("item does not match model") from None
+
+        try:
+            self.items.append(item)
+        except:
+            raise Exception("item does not match model") from None
 
 
-    def remove(self, item: BaseModel) -> None:
-        self.items.remove(item)
-        # sort by key
+    def remove(self, item: JsonIOModel) -> None:
 
-
+        if item in self.items:
+            self.items.remove(item)
     
     def remove(self, key) -> None:
         if self.key is None:
@@ -84,7 +105,14 @@ class JsonIO:
 
 
     def __getitem__(self, key):
-        return self.items[key]
+
+        if self.key is None:
+            raise Exception("key not set")
+        else:
+            for i in range(len(self.items)):
+                if self.items[i][self.key] == key:
+                    return self.items[i]
+            raise Exception("item not found") from None
 
 
 
@@ -100,11 +128,3 @@ class JsonIO:
 
     def __str__(self):
         return str(self.items)
-    
-
-
-    def __del__(self):
-        del self.items
-        del self.model
-        del self.file
-        del self

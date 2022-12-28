@@ -7,5 +7,4 @@ class TestModel(JsonIOModel):
 
 
 test = JsonIO("testfile.json", TestModel, key = "id")
-test.sort()
-print(test)
+print(test[5])
