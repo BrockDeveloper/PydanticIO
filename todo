@@ -1,9 +1,0 @@
-[] optional model pydantic
-    [] how to write to model?
-[x] dict translation
-[x] input and output to/fom file
-[] exceptions handler
-[] model definition
-[x] access to elements (key and global)
-[x] json and dict manipulation
-[] data validation (with pydantic?)

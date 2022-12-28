@@ -1,6 +1,6 @@
 import json
 from pyjsonio.jsoniomodel import JsonIOModel
-
+from pyjsonio.exceptions import *
 
 
 class JsonIO:
@@ -15,13 +15,13 @@ class JsonIO:
         self.key = None
 
         if not issubclass(model, JsonIOModel):
-            raise Exception("model must be a JsonIOModel") from None
+            raise ModelClassError() from None
 
         try:
             with open(json_file, "r") as f:
                 f.close()
         except:
-            raise Exception("file not found: " + json_file) from None
+            raise FileError(json_file) from None
 
         self.model = model
         self.file = json_file
@@ -39,14 +39,14 @@ class JsonIO:
         try:
             self.items = [self.model(**element) for element in _dict]
         except:
-            raise Exception("file does not match model") from None
+            raise FileItemMatchError(json_file) from None
         
         del _dict
 
         # key must be a key in the model
         if key is not None:
-            if key not in self.model.__fields__:
-                raise Exception("key must be a field in the model") from None
+            if key not in self.model.__fields__: 
+                raise KeyError(key, self.model) from None
         
         self.key = key
 
@@ -63,13 +63,13 @@ class JsonIO:
                 json.dump([element.dict() for element in self.items], f, indent=4)
                 f.close()
         except:
-            raise Exception("error writing to file: " + json_file) from None
+            raise FileWriteError(json_file) from None
 
 
 
     def sort(self) -> None:
         if self.key is None:
-            raise Exception("key not set")
+            raise Exception("key not set") from None
         self.items.sort(key=lambda x: x[self.key])
 
 
@@ -81,12 +81,12 @@ class JsonIO:
     def append(self, item: JsonIOModel) -> None:
 
         if not issubclass(item, self.model):
-            raise Exception("item does not match model") from None
+            raise ItemMatchError() from None
 
         try:
             self.items.append(item)
         except:
-            raise Exception("item does not match model") from None
+            raise ItemMatchError() from None
 
 
     def remove(self, item: JsonIOModel) -> None:
@@ -96,7 +96,7 @@ class JsonIO:
     
     def remove(self, key) -> None:
         if self.key is None:
-            raise Exception("key not set")
+            raise KeyError() from None
         for i in range(len(self.items)):
             if self.items[i][self.key] == key:
                 del self.items[i]
@@ -107,16 +107,16 @@ class JsonIO:
     def __getitem__(self, key):
 
         if self.key is None:
-            raise Exception("key not set")
+            raise KeyError() from None
         else:
             for i in range(len(self.items)):
                 if self.items[i][self.key] == key:
                     return self.items[i]
-            raise Exception("item not found") from None
+            raise ItemNotFoundError() from None
 
 
 
-    def __iter__(self):    # remove an item by index
+    def __iter__(self):
         return iter(self.items)
 
 
