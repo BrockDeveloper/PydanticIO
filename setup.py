@@ -1,9 +1,9 @@
-import pydanticio
+import setuptools
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-pydanticio.setup(
+setuptools.setup(
     name='PydanticIO',
     version='0.0.1',
     author='Andrea Broccoletti',
