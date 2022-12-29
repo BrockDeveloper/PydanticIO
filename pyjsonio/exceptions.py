@@ -1,6 +1,4 @@
 
-
-
 class Exception(Exception):
 
     '''
@@ -86,3 +84,14 @@ class ItemNotFoundError(Exception):
 
     def __init__(self):
         super().__init__("Exception: item not found")
+
+
+
+class AttributeNotFoundError(Exception):
+
+    '''
+    Exception raised when the attribute is not found in the model.
+    '''
+
+    def __init__(self, attribute):
+        super().__init__("Exception: attribute " + attribute + " not found in model.")
