@@ -1,10 +1,10 @@
 
 import json
-from pyjsonio.exceptions import *
-from pyjsonio.jsoniomodel import JsonIOModel
+from pydanticio.exceptions import *
+from pydanticio.pydanticio_model import PydanticIOModel
 
 
-class JsonIO:
+class PydanticIO:
 
     '''
     JsonIO class
@@ -14,7 +14,7 @@ class JsonIO:
 
 
 
-    def __init__(self, json_file: str, model: JsonIOModel, key: str = None) -> None:
+    def __init__(self, json_file: str, model: PydanticIOModel, key: str = None) -> None:
 
         '''
         JsonIO class constructor
@@ -25,7 +25,7 @@ class JsonIO:
         
         :return: None
         
-        :raises ModelClassError: if model is not a subclass of JsonIOModel
+        :raises ModelClassError: if model is not a subclass of PydanticIOModel
         :raises FileError: if json_file is not a valid file
         :raises FileItemMatchError: if json_file items don't match model
         :raises KeyError: if key is not a key in the model
@@ -36,7 +36,7 @@ class JsonIO:
         self.items = []
         self.key = None
 
-        if not issubclass(model, JsonIOModel):
+        if not issubclass(model, PydanticIOModel):
             raise ModelClassError() from None
 
         try:
@@ -123,7 +123,7 @@ class JsonIO:
 
 
 
-    def append(self, item: JsonIOModel) -> None:
+    def append(self, item: PydanticIOModel) -> None:
 
         '''
         Append an item to the list
@@ -145,7 +145,7 @@ class JsonIO:
 
 
 
-    def remove(self, item: JsonIOModel) -> None:
+    def remove(self, item: PydanticIOModel) -> None:
 
         '''
         Remove an item from the list

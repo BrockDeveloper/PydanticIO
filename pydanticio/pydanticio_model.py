@@ -1,9 +1,9 @@
 
 from pydantic import BaseModel
-from pyjsonio.exceptions import AttributeNotFoundError
+from pydanticio.exceptions import AttributeNotFoundError
 
 
-class JsonIOModel(BaseModel):
+class PydanticIOModel(BaseModel):
 
     '''
     Base class for all models used in this module.
